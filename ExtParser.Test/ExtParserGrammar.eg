@@ -1,0 +1,68 @@
+﻿Grammar =
+	Rule+ ;
+
+Rule =
+	RuleName
+	(
+		[ IsGlobalRule ]
+		| ( [ IsGlobalRule | ExcludedGlobalRules ] "=" RuleBody )
+	)
+	";" ;
+
+RuleName ! =
+	( 'a'..'z' | 'A'..'Z' | '0'..'9' | "_" )* ;
+
+IsGlobalRule ! =
+	"*" ;
+
+ExcludedGlobalRules =
+	"!" [ "(" RuleName ( "," RuleName )* ")" ] ;
+
+RuleBody =
+	Expression+ ;
+
+Expression =
+	(
+		(
+			( ExpressionGroup | RuleName | Literal | CharacterRange )
+			[ ZeroOrMoreTimes | OneOrMoreTimes ]
+		)
+		| OptionalExpression
+	)
+	[ AlternateExpression ];
+
+ExpressionGroup =
+	"(" Expression+ ")" ;
+
+OptionalExpression =
+	"[" Expression+ "]" ;
+
+AlternateExpression =
+	"|" Expression ;
+
+ZeroOrMoreTimes ! =
+	"*" ;
+
+OneOrMoreTimes ! =
+	"+" ;
+
+Literal ! =
+	"\"" LiteralValue "\"" ;
+
+LiteralValue ! =
+    ( '\u0000'..'\u0021' | '\u0023'..'\u005B' | '\u005D'..'\uFFFF' | "\\\\" | "\\\"" | UnicodeCharacter )* ;
+
+CharacterRange ! =
+	Character ".." Character ;
+
+Character ! =
+	"'" CharacterValue "'" ;
+
+CharacterValue ! =
+	'\u0000'..'\u0026' | '\u0028'..'\u005B' | '\u005D'..'\uFFFF' | "\\\\" | "\\'" | UnicodeCharacter ;
+
+UnicodeCharacter ! =
+	"\\u" ( '0'..'9' | 'A'..'F' ) ( '0'..'9' | 'A'..'F' ) ( '0'..'9' | 'A'..'F' ) ( '0'..'9' | 'A'..'F' ) ;
+
+Whitespace * =
+	( " " | "\u000A" | "\u000D" | "\u0009" )+ ;

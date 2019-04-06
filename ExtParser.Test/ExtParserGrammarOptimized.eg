@@ -1,0 +1,58 @@
+﻿Grammar =
+	Rule+ ;
+
+Rule =
+	RuleName
+	(
+		[ IsGlobalRule ]
+		| ( [ IsGlobalRule | ExcludedGlobalRules ] "=" RuleBody )
+	)
+	";" ;
+
+RuleName ;
+
+IsGlobalRule ;
+
+ExcludedGlobalRules =
+	"!" [ "(" RuleName ( "," RuleName )* ")" ] ;
+
+RuleBody =
+	Expression+ ;
+
+Expression =
+	(
+		(
+			( ExpressionGroup | RuleName | Literal | CharacterRange )
+			[ ZeroOrMoreTimes | OneOrMoreTimes ]
+		)
+		| OptionalExpression
+	)
+	[ AlternateExpression ];
+
+ExpressionGroup =
+	"(" Expression+ ")" ;
+
+OptionalExpression =
+	"[" Expression+ "]" ;
+
+AlternateExpression =
+	"|" Expression ;
+
+ZeroOrMoreTimes ;
+
+OneOrMoreTimes ;
+
+Literal ! =
+	"\"" LiteralValue "\"" ;
+
+LiteralValue ;
+
+CharacterRange ! =
+	Character ".." Character ;
+
+Character ! =
+	"'" CharacterValue "'" ;
+
+CharacterValue ;
+
+Whitespace * ;
